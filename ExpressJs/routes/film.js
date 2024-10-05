@@ -1,90 +1,90 @@
 import express from 'express';
-import Joi from "joi"
-const router = express.Router()
-export default router
+import mongoose from "mongoose";
+import Joi from "joi";
 
+const router = express.Router();
 
-const genres = [
-    {id : 1, genre: "Action"},
-    {id : 2, genre: "Horreur"},
-    {id : 3, genre: "Thriller"},
-]
+const genreSchema = Joi.object({
+    genre: Joi.string().min(3).max(20).regex(/.*[a-zA-Z].*/).trim().required()
+        .messages({
+            'string.pattern.base': 'Le genre doit contenir au moins une lettre',
+            'string.min': 'Le genre doit avoir au moins {#limit} caractères',
+            'string.max': 'Le genre ne doit pas dépasser {#limit} caractères',
+            'any.required': 'Le genre est requis'
+        })
+});
 
-router.get('/', (req,res) => {
-    res.send("Bonjour Api Film")
-})
-
-router.get('/', (req,res) => {
-    res.send(genres)
-})
-
-router.get('/:id', (req,res) => {
-    const parsedId = parseInt(req.params.id)
-    if(isNaN(parsedId)) return res.status(400).send("Ce n'est pas un nombre")
-    const IdGenre = genres.find((genre) => genre.id === parsedId)
-if(!IdGenre) return res.status(400).send("Cet ID n'existe pas ")
-    res.send(IdGenre)
-})
-
-
-router.post("/", (req,res) => {
-    const nouveaugenre = {
-        id : genres.length + 1 , 
-        genre : req.body.genre
+const FilmSchema = new mongoose.Schema({
+    genre: {
+        type: String,
+        required: true,
+        minlength: 3,
+        maxlength: 30,
+        trim: true,
+        validate: {
+            validator: v => v.length > 3,
+            message: "Vous devez mettre un genre de film"
+        }
     }
+});
 
-    const schema = Joi.object({
-        genre: Joi.string().min(3).max(20).regex(/.*[a-zA-Z].*/).trim().required()
-        .messages({
-                'string.pattern.base': 'Le genre doit contenir au moins une lettre',
-                'string.min': 'Le genre doit avoir au moins {#limit} caractères',
-                'string.max': 'Le genre ne doit pas dépasser {#limit} caractères',
-                'any.required': 'Le genre est requis'
-            })
-    });
-    
-    const ResultatValidation = schema.validate(req.body);
-    if (ResultatValidation.error) return res.status(400).send(ResultatValidation.error.details[0].message);
-    
+const Genre = mongoose.model('Genre', FilmSchema);
 
-    genres.push(nouveaugenre)
-    res.send(genres)
-})
+const validateGenre = (req, res, next) => {
+    const { error } = genreSchema.validate(req.body);
+    if (error) return res.status(400).send(error.details[0].message);
+    next();
+};
 
+const validateId = (req, res, next) => {
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+        return res.status(400).send("ID invalide");
+    }
+    next();
+};
 
-router.put("/:id", (req,res) => {
+router.get('/', async (req, res) => {
+    const genres = await Genre.find().sort("genre");
+    res.send(genres);
+});
 
-    const parsedId = parseInt(req.params.id)
-    if(isNaN(parsedId)) return res.status(400).send("Ce n'est pas un nombre")
-    const IdGenre = genres.find((genre) => genre.id === parsedId)
-if(!IdGenre) return res.status(400).send("Cet ID n'existe pas ")
+router.get('/:id', validateId, async (req, res) => {
+    const genre = await Genre.findById(req.params.id);
+    if (!genre) return res.status(404).send("Cet ID n'existe pas");
+    res.send(genre);
+});
 
-    const schema = Joi.object({
-        genre: Joi.string().min(3).max(20).regex(/.*[a-zA-Z].*/).trim().required()
-        .messages({
-                'string.pattern.base': 'Le genre doit contenir au moins une lettre',
-                'string.min': 'Le genre doit avoir au moins {#limit} caractères',
-                'string.max': 'Le genre ne doit pas dépasser {#limit} caractères',
-                'any.required': 'Le genre est requis'
-            })
-    });
-    
-    const ResultatValidation = schema.validate(req.body);
-    if (ResultatValidation.error) return res.status(400).send(ResultatValidation.error.details[0].message);
-    
-    IdGenre.genre = req.body.genre
-    res.send(IdGenre)
-})
+router.post("/", validateGenre, async (req, res) => {
+    let genre = new Genre({ genre: req.body.genre });
+    await genre.save();
+    res.status(201).send(genre);
+});
 
-router.delete("/api/film/:id",(req,res) => {
-    const parsedId = parseInt(req.params.id)
-    if(isNaN(parsedId)) return res.status(400).send("Ce n'est pas un nombre")
-    const IdGenre = genres.find((genre) => genre.id === parsedId)
-    if(!IdGenre) return res.status(400).send("Cet ID n'existe pas ")
+router.put("/:id", [validateId, validateGenre], async (req, res) => {
+    try {
+        const genre = await Genre.findByIdAndUpdate(
+            req.params.id,
+            { genre: req.body.genre },
+            { new: true, runValidators: true }
+        );
+        if (!genre) return res.status(404).send("Genre non trouvé");
+        res.send(genre);
+    } catch (error) {
+        if (error instanceof mongoose.Error.ValidationError) {
+            return res.status(400).send(error.message);
+        }
+        res.status(500).send("Une erreur est survenue lors de la mise à jour");
+    }
+});
 
-        const index = genres.indexOf(IdGenre)
-        genres.splice(index,1)
-        res.send(IdGenre)
+router.delete("/:id", validateId, async (req, res) => {
+    try {
+        const genre = await Genre.findByIdAndDelete(req.params.id);
+        if (!genre) return res.status(404).send("Genre non trouvé");
+        res.send({ message: "Genre supprimé avec succès", genre });
+    } catch (error) {
+        res.status(500).send(`Une erreur est survenue lors de la suppression: ${error.message}`);
+    }
+});
 
-
-})
+export default router;
