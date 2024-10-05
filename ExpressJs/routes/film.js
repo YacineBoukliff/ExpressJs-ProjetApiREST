@@ -4,6 +4,7 @@ import Joi from "joi";
 
 const router = express.Router();
 
+// Schéma Joi pour la validation
 const genreSchema = Joi.object({
     genre: Joi.string().min(3).max(20).regex(/.*[a-zA-Z].*/).trim().required()
         .messages({
@@ -14,6 +15,7 @@ const genreSchema = Joi.object({
         })
 });
 
+// Schéma Mongoose
 const FilmSchema = new mongoose.Schema({
     genre: {
         type: String,
@@ -30,37 +32,39 @@ const FilmSchema = new mongoose.Schema({
 
 const Genre = mongoose.model('Genre', FilmSchema);
 
-const validateGenre = (req, res, next) => {
-    const { error } = genreSchema.validate(req.body);
-    if (error) return res.status(400).send(error.details[0].message);
-    next();
-};
-
-const validateId = (req, res, next) => {
-    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
-        return res.status(400).send("ID invalide");
-    }
-    next();
-};
-
+// Routes
 router.get('/', async (req, res) => {
     const genres = await Genre.find().sort("genre");
     res.send(genres);
 });
 
-router.get('/:id', validateId, async (req, res) => {
+router.get('/:id', async (req, res) => {
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+        return res.status(400).send("ID invalide");
+    }
+
     const genre = await Genre.findById(req.params.id);
     if (!genre) return res.status(404).send("Cet ID n'existe pas");
     res.send(genre);
 });
 
-router.post("/", validateGenre, async (req, res) => {
+router.post("/", async (req, res) => {
+    const { error } = genreSchema.validate(req.body);
+    if (error) return res.status(400).send(error.details[0].message);
+
     let genre = new Genre({ genre: req.body.genre });
     await genre.save();
     res.status(201).send(genre);
 });
 
-router.put("/:id", [validateId, validateGenre], async (req, res) => {
+router.put("/:id", async (req, res) => {
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+        return res.status(400).send("ID invalide");
+    }
+
+    const { error } = genreSchema.validate(req.body);
+    if (error) return res.status(400).send(error.details[0].message);
+
     try {
         const genre = await Genre.findByIdAndUpdate(
             req.params.id,
@@ -77,7 +81,11 @@ router.put("/:id", [validateId, validateGenre], async (req, res) => {
     }
 });
 
-router.delete("/:id", validateId, async (req, res) => {
+router.delete("/:id", async (req, res) => {
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+        return res.status(400).send("ID invalide");
+    }
+
     try {
         const genre = await Genre.findByIdAndDelete(req.params.id);
         if (!genre) return res.status(404).send("Genre non trouvé");
