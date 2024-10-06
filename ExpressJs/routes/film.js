@@ -4,9 +4,8 @@ import Joi from "joi";
 
 const router = express.Router();
 
-// Schéma Joi pour la validation
 const genreSchema = Joi.object({
-    genre: Joi.string().min(3).max(20).regex(/.*[a-zA-Z].*/).trim().required()
+    genre: Joi.string().min(3).max(30).regex(/.*[a-zA-Z].*/).trim().required()
         .messages({
             'string.pattern.base': 'Le genre doit contenir au moins une lettre',
             'string.min': 'Le genre doit avoir au moins {#limit} caractères',
@@ -15,24 +14,23 @@ const genreSchema = Joi.object({
         })
 });
 
-// Schéma Mongoose
 const FilmSchema = new mongoose.Schema({
     genre: {
         type: String,
-        required: true,
-        minlength: 3,
-        maxlength: 30,
+        required: [true, 'Le genre est requis'],
+        minlength: [3, 'Le genre doit avoir au moins 3 caractères'],
+        maxlength: [30, 'Le genre ne doit pas dépasser 30 caractères'],
         trim: true,
         validate: {
-            validator: v => v.length > 3,
-            message: "Vous devez mettre un genre de film"
+            validator: v => /.*[a-zA-Z].*/.test(v),
+            message: "Le genre doit contenir au moins une lettre"
         }
     }
 });
 
 const Genre = mongoose.model('Genre', FilmSchema);
 
-// Routes
+
 router.get('/', async (req, res) => {
     const genres = await Genre.find().sort("genre");
     res.send(genres);
