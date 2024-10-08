@@ -47,8 +47,11 @@ router.get('/:id', async (req, res) => {
 });
 
 router.post("/", async (req, res) => {
-    const { error } = genreSchema.validate(req.body);
-    if (error) return res.status(400).send(error.details[0].message);
+    const validationResult = genreSchema.validate(req.body);
+    if (validationResult.error) {
+        return res.status(400).send(validationResult.error.details[0].message);
+    }
+    
 
     let genre = new Genre({ genre: req.body.genre });
     await genre.save();
@@ -59,10 +62,10 @@ router.put("/:id", async (req, res) => {
     if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
         return res.status(400).send("ID invalide");
     }
-
-    const { error } = genreSchema.validate(req.body);
-    if (error) return res.status(400).send(error.details[0].message);
-
+    const validationResult = genreSchema.validate(req.body);
+    if (validationResult.error) {
+        return res.status(400).send(validationResult.error.details[0].message);
+    }    
     try {
         const genre = await Genre.findByIdAndUpdate(
             req.params.id,
@@ -83,7 +86,6 @@ router.delete("/:id", async (req, res) => {
     if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
         return res.status(400).send("ID invalide");
     }
-
     try {
         const genre = await Genre.findByIdAndDelete(req.params.id);
         if (!genre) return res.status(404).send("Genre non trouvé");
