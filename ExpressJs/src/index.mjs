@@ -1,5 +1,6 @@
 import express from 'express';
 import film from "../routes/film.js"
+import clients from '../routes/clients.js'
 import mongoose from "mongoose";
 
 const app = express()
@@ -9,6 +10,7 @@ mongoose.connect('mongodb://localhost/film').then(() => {console.log("Connexion 
 app.use(express.json())
 
 app.use("/api/film/", film)
+app.use("/api/clients/", clients)
 
 const port = process.env.PORT || 5000
 
