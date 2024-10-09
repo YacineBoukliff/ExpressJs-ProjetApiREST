@@ -4,7 +4,7 @@ import Joi from "joi";
 
 const router = express.Router();
 
-const genreSchema = Joi.object({
+ const genreSchema = Joi.object({
     genre: Joi.string().min(3).max(30).regex(/.*[a-zA-Z].*/).trim().required()
         .messages({
             'string.pattern.base': 'Le genre doit contenir au moins une lettre',
@@ -28,7 +28,7 @@ const FilmSchema = new mongoose.Schema({
     }
 });
 
-const Genre = mongoose.model('Genre', FilmSchema);
+export const Genre = mongoose.model('Genre', FilmSchema);
 
 
 router.get('/', async (req, res) => {
