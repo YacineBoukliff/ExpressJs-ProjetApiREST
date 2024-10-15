@@ -1,0 +1,159 @@
+SUPPRIMER LA BDD sur son PC pour partir de zéro et suivre ceci ( uniquement les routes post )  : 
+
+# Routes à tester dans Postman
+
+## Genres
+
+1. **GET /api/film** 
+   - Méthode: GET
+   - URL: `http://localhost:5000/api/film`
+   - Description: Récupère tous les genres
+
+2. **POST /api/film**
+   - Méthode: POST
+   - URL: `http://localhost:5000/api/film`
+   - Body (raw JSON):
+     ```json
+     {
+         "genre": "Action"
+     }
+     ```
+   - Description: Crée un nouveau genre
+
+3. **GET /api/film/:id**
+   - Méthode: GET
+   - URL: `http://localhost:5000/api/film/:id` (remplacer :id par l'ID réel)
+   - Description: Récupère un genre spécifique
+
+4. **PUT /api/film/:id**
+   - Méthode: PUT
+   - URL: `http://localhost:5000/api/film/:id` (remplacer :id par l'ID réel)
+   - Body (raw JSON):
+     ```json
+     {
+         "genre": "Action-Adventure"
+     }
+     ```
+   - Description: Met à jour un genre existant
+
+5. **DELETE /api/film/:id**
+   - Méthode: DELETE
+   - URL: `http://localhost:5000/api/film/:id` (remplacer :id par l'ID réel)
+   - Description: Supprime un genre
+
+## Movies
+
+6. **GET /api/movie**
+   - Méthode: GET
+   - URL: `http://localhost:5000/api/movie`
+   - Description: Récupère tous les films
+
+7. **POST /api/movie**
+   - Méthode: POST
+   - URL: `http://localhost:5000/api/movie`
+   - Body (raw JSON):
+     ```json
+     {
+         "title": "Inception",
+         "genreId": "ID_DU_GENRE",
+         "numberInStock": 5,
+         "dailyRentalRate": 2.5
+     }
+     ```
+   - Description: Crée un nouveau film
+
+8. **GET /api/movie/:id**
+   - Méthode: GET
+   - URL: `http://localhost:5000/api/movie/:id` (remplacer :id par l'ID réel)
+   - Description: Récupère un film spécifique
+
+9. **PUT /api/movie/:id**
+   - Méthode: PUT
+   - URL: `http://localhost:5000/api/movie/:id` (remplacer :id par l'ID réel)
+   - Body (raw JSON):
+     ```json
+     {
+         "title": "Inception 2",
+         "genreId": "ID_DU_GENRE",
+         "numberInStock": 10,
+         "dailyRentalRate": 3
+     }
+     ```
+   - Description: Met à jour un film existant
+
+10. **DELETE /api/movie/:id**
+    - Méthode: DELETE
+    - URL: `http://localhost:5000/api/movie/:id` (remplacer :id par l'ID réel)
+    - Description: Supprime un film
+
+## Clients
+
+11. **GET /api/clients**
+    - Méthode: GET
+    - URL: `http://localhost:5000/api/clients`
+    - Description: Récupère tous les clients
+
+12. **POST /api/clients**
+    - Méthode: POST
+    - URL: `http://localhost:5000/api/clients`
+    - Body (raw JSON):
+      ```json
+      {
+          "nom": "John Doe",
+          "phone": "1234567890",
+          "isGold": false
+      }
+      ```
+    - Description: Crée un nouveau client
+
+13. **GET /api/clients/:id**
+    - Méthode: GET
+    - URL: `http://localhost:5000/api/clients/:id` (remplacer :id par l'ID réel)
+    - Description: Récupère un client spécifique
+
+14. **PUT /api/clients/:id**
+    - Méthode: PUT
+    - URL: `http://localhost:5000/api/clients/:id` (remplacer :id par l'ID réel)
+    - Body (raw JSON):
+      ```json
+      {
+          "nom": "John Doe Updated",
+          "phone": "0987654321",
+          "isGold": true
+      }
+      ```
+    - Description: Met à jour un client existant
+
+15. **DELETE /api/clients/:id**
+    - Méthode: DELETE
+    - URL: `http://localhost:5000/api/clients/:id` (remplacer :id par l'ID réel)
+    - Description: Supprime un client
+
+## Rentals
+
+16. **GET /api/rentals**
+    - Méthode: GET
+    - URL: `http://localhost:5000/api/rentals`
+    - Description: Récupère toutes les locations
+
+17. **POST /api/rentals**
+    - Méthode: POST
+    - URL: `http://localhost:5000/api/rentals`
+    - Body (raw JSON):
+      ```json
+      {
+          "customerId": "ID_DU_CLIENT",
+          "movieId": "ID_DU_FILM"
+      }
+      ```
+    - Description: Crée une nouvelle location
+
+18. **GET /api/rentals/:id**
+    - Méthode: GET
+    - URL: `http://localhost:5000/api/rentals/:id` (remplacer :id par l'ID réel)
+    - Description: Récupère une location spécifique
+
+19. **PUT /api/rentals/:id**
+    - Méthode: PUT
+    - URL: `http://localhost:5000/api/rentals/:id` (remplacer :id par l'ID réel)
+    - Description: Marque une location comme retournée (pas besoin de body)
