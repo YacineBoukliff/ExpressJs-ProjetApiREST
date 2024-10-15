@@ -3,6 +3,7 @@ import {User} from "../models/user.js";
 import bcrypt from "bcrypt"
 import Joi from "joi";
 import passwordComplexity from 'joi-password-complexity';
+import jwt from "jsonwebtoken"
 
 const router = express.Router();
 
@@ -21,7 +22,11 @@ router.post("/", async (req, res) => {
 
   const motdepassevalide = await bcrypt.compare(req.body.password,user.password)
   if(!motdepassevalide) return res.status(400).send("Email ou Mot de passe incorrect");
-  res.send(true)
+  
+  const token = jwt.sign({_id : user._id}, 'jwtPrivateKey')
+  
+  res.send(token)
+
 });
 
  function validate(req) {

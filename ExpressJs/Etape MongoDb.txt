@@ -157,3 +157,12 @@ SUPPRIMER LA BDD sur son PC pour partir de zéro et suivre ceci ( uniquement les
     - Méthode: PUT
     - URL: `http://localhost:5000/api/rentals/:id` (remplacer :id par l'ID réel)
     - Description: Marque une location comme retournée (pas besoin de body)
+
+
+
+Faire la méthode POST pour user et auth aussi et voici sinon le contenu POST pour tester le JWT dans mongoose : 
+
+{ 
+    "email" :"yacine698@live.fr",
+    "password" :"Yacine69@"
+}
