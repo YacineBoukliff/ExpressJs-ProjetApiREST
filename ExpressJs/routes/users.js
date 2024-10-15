@@ -1,6 +1,7 @@
 import express from 'express';
 import { User, ValidateUser} from "../models/user.js";
 import lodash from "lodash"
+import bcrypt from "bcrypt"
 
 const router = express.Router();
 
@@ -18,6 +19,9 @@ router.post("/", async (req, res) => {
     if (user) return res.status(400).send("Utilisateur déjà enregistré");
 
     user = new User(lodash.pick(req.body,['name','email','password']));
+
+    const saltRounds = 10;
+    user.password = await bcrypt.hash(user.password,saltRounds)
 
     await user.save();
     res.status(201).send(lodash.pick(user,['_id','name','email']));

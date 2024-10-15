@@ -4,6 +4,7 @@ import clients from '../routes/clients.js'
 import rentals from '../routes/rentals.js';
 import movie from '../routes/movie.js'
 import users from "../routes/users.js"
+import auth from "../routes/auth.js"
 import mongoose from "mongoose";
 
 const app = express()
@@ -19,6 +20,7 @@ app.use("/api/clients/", clients)
 app.use("/api/movie/", movie)
 app.use('/api/rentals', rentals);
 app.use('/api/users', users);
+app.use('/api/auth', auth);
 
 const port = process.env.PORT || 5000
 
